@@ -1,0 +1,40 @@
+server:
+  port: 8082
+
+beetl:
+  enabled: true
+  resource-auto-check: true
+
+# Oracle数据库
+spring:
+  mvc:
+    view:
+      prefix: /pages
+  datasource:
+    oracle: #数据源1 Oracle
+      driver-class-name: oracle.jdbc.OracleDriver
+      url: jdbc:oracle:thin:@127.0.0.1:1521:orcl
+      username: cwcs # 用户名
+      password: 123456 # 密码
+      filters: wall,mergeStat
+      # 连接池大小根据实际情况调整
+      max-active: 500
+      max-pool-prepared-statement-per-connection-size: 100
+      validation-query: select 'x' from dual
+    mysql: # 数据源2 mysql
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/signuphere?serverTimezone=GMT%2B8&characterEncoding=UTF-8
+      username: root # 用户名
+      password: 123456 # 密码
+
+
+mydb:
+  sql: select * from sys t
+
+log4j:
+  logger:
+    org:
+      springframework:
+        jdbc:
+          core:
+            JdbcTemplate: debug

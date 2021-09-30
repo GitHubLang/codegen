@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>layout 管理系统大布局 - Layui</title>
+    <link rel="stylesheet" href="/assets/layui/css/layui.css">
+    <link rel="stylesheet" href="/assets/highlight/styles/androidstudio.min.css">
+    <style>
+        .layui-table-cell {
+            overflow: visible;
+        }
+        .layui-table-box {
+            overflow: visible;
+        }
+        .layui-table-body {
+            overflow: visible;
+        }
+
+        /* 设置下拉框的高度与表格单元相同 */
+        td .layui-form-select {
+            margin-top: -10px;
+            margin-left: -15px;
+            margin-right: -15px;
+        }
+        td .cfg-input{
+            width: 100px;
+            margin-top: -10px;
+            margin-left: -15px;
+            margin-right: -15px;
+        }
+
+        td .value-input{
+
+            margin-top: -10px;
+            margin-left: -15px;
+            margin-right: -15px;
+        }
+        pre{
+            margin: 14px;
+        }
+        pre:hover .copy-button {
+            display: block;
+        }
+        .copy-button {
+            display: none;
+            position: absolute;
+            width: 25px;
+            right: 13px;
+            font-size: 12px;
+            color: #ffffff;
+            background-color: #9999AA;
+            padding: 2px 8px;
+            margin: 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgb(0 0 0 / 5%), 0 2px 4px rgb(0 0 0 / 5%);
+        }
+        .p-title {
+            font-size: 18px;
+            color: #4d4d4d;
+            font-weight: 400;
+            line-height: 26px!important;
+            margin: 10px 0 0px 14px;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo layui-hide-xs layui-bg-black">layout demo</div>
+        <!-- 头部区域（可配合layui 已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left">
+            <!-- 移动端显示 -->
+            <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
+                <i class="layui-icon layui-icon-spread-left"></i>
+            </li>
+
+            <li class="layui-nav-item layui-hide-xs"><a href="">nav 1</a></li>
+            <li class="layui-nav-item layui-hide-xs"><a href="">nav 2</a></li>
+            <li class="layui-nav-item layui-hide-xs"><a href="">nav 3</a></li>
+            <li class="layui-nav-item">
+                <a href="javascript:;">nav groups</a>
+                <dl class="layui-nav-child">
+                    <dd><a href="">menu 11</a></dd>
+                    <dd><a href="">menu 22</a></dd>
+                    <dd><a href="">menu 33</a></dd>
+                </dl>
+            </li>
+        </ul>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item layui-hide layui-show-md-inline-block">
+                <a href="javascript:;">
+                    <img src="#" class="layui-nav-img">
+                    tester
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="">Your Profile</a></dd>
+                    <dd><a href="">Settings</a></dd>
+                    <dd><a href="">Sign out</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
+                <a href="javascript:;">
+                    <i class="layui-icon layui-icon-more-vertical"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="" href="javascript:;">menu group 1</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="javascript:;">menu 1</a></dd>
+                        <dd><a href="javascript:;">menu 2</a></dd>
+                        <dd><a href="javascript:;">menu 3</a></dd>
+                        <dd><a href="">the links</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">menu group 2</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="javascript:;">list 1</a></dd>
+                        <dd><a href="javascript:;">list 2</a></dd>
+                        <dd><a href="">超链接</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item"><a href="javascript:;">click menu item</a></li>
+                <li class="layui-nav-item"><a href="">the links</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-body">
+        <!-- 内容主体区域 -->
+        <div style="padding: 15px;">
+            <form class="layui-form" style="margin-bottom: 8px;"> <!-- 提示：如果你不想用form，你可以换成div等任何一个普通元素 -->
+
+                <div class="layui-inline" >
+                    <label class="layui-form-label">数据库表 </label>
+                    <div class="layui-input-inline" style="width: 500px">
+                        <select id = "dbtables" name="dbtables"  lay-filter="dbtables" lay-search="">
+                        </select>
+                    </div>
+                </div>
+             </form>
+
+            <div style="float: left; margin-left:15px ">
+                <button id="btnAdd" class="layui-btn icon-btn" style="background-color: #35CEB0;"><i class="layui-icon"></i>新增</button>
+                <button id="upformButton" class="layui-btn icon-btn upformButton" style="background-color: #35CEB0;"><i class="layui-icon"></i>上移</button>
+                <button id="downformButton" class="layui-btn icon-btn downformButton" style="background-color: #35CEB0;"><i class="layui-icon"></i>下移</button>
+                <button id="setValue" class="layui-btn icon-btn setValue" style="background-color: #35CEB0;"><i class="layui-icon"></i>设置值</button>
+            </div>
+            <div style="float: right; margin-right:15px ">
+                <button id="btnGen" class="layui-btn icon-btn" style="background-color: #35CEB0;"><i class="layui-icon"></i>生成</button>
+                <button id="btnAddField" class="layui-btn icon-btn" style="background-color: #35CEB0;"><i class="layui-icon"></i>加字段</button>
+            </div>
+            <div style="margin: 15px;">
+                <table class="layui-table" id="table1" lay-filter="table1" style="overflow-x: auto;"></table>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="layui-footer">
+        <!-- 底部固定区域 -->
+        底部固定区域
+    </div>
+
+</div>
+<script src="/assets/highlight/highlight.min.js"></script>
+<script src="/assets/clipbord/clipboard.min.js"></script>
+<script src="/assets/layui/layui.js"></script>
+<script src="/assets/index.js"></script>
+<script>
+    //JS
+    var clipboard = new ClipboardJS('.copy-button');
+    clipboard.on('success', function(e) {
+        //console.log(e);
+    });
+    clipboard.on('error', function(e) {
+        console.log(e);
+    });
+
+    hljs.copyCode = function (e) {
+
+    }
+</script>
+</body>
+</html>
