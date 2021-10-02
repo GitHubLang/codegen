@@ -15,4 +15,9 @@ public class LayuiFactory {
         entity.setData(res);
         return entity;
     }
+
+    public static LayuiEntity genLayuiEntity(){
+        LayuiEntity entity = new LayuiEntity();
+        return entity;
+    }
 }

@@ -14,7 +14,7 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
         ,formTools = layui.formTools
         ,model = formTools.model
         ,$ = layui.$;
-    var wCount = 0;
+    var wCount = 1;
 
     var table1 = {
         tableId: "table1"    //表格id
@@ -29,7 +29,7 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
             {type: 'radio',field: 'moveRadio',title:'移动'},
              {type: 'numbers',field: 'orderNum',title:'序号'},
 
-            {field: 'column',  sort: true, title: '列名'},
+            {field: 'fieldName',  sort: true, title: '列名'},
             {field: 'isnull',  hide: true, title: '为空'},
             {field: 'comments', align: "center", title: '备注' , templet:function (d) {
                 if(formTools.isEmpty(d.comments)) d.comments = '';
@@ -70,7 +70,7 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
     var addField = ['entity','result','mapper'];
 
 
-
+    //数据库表
     formTools.setSelectFromUrl('dbtables', '/allTables', {},{
         keyName: 'name',
         valueName: 'comments'
@@ -78,6 +78,31 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
         return  res.data;
     });
 
+    //模板文件
+
+    var templateSelect = xmSelect.render({
+        el: '#tmpName',
+        filterable: true,
+        tips: '请选择模板文件',
+        delay:100,
+        prop:{
+            name:'fileName',
+            value:'fileName'
+        },
+        toolbar: {
+            show: true,
+        },
+        data: []
+    });
+
+    $.post('/allTemplates',{},function (res) {
+        var data = res.data;
+        templateSelect.update({data:data});
+    },'json');
+
+
+
+    // 数据库表事件, 渲染表格
     form.on('select(dbtables)',function (data) {
         var value = data.value;
         // 渲染表格
@@ -114,23 +139,66 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
     $('#btnGen').click(function (e) {
         var checkRows = table.checkStatus(table1.tableId);
         getConfigValue(checkRows.data);
-        //console.log(checkRows.data);
+       // console.log(checkRows.data);
         var htmlStr = genHtmlTemplate(checkRows.data);
         var entityJson = genAddField(checkRows.data);
         var addFieldHtml = '';
         for(var key in entityJson){
-            addFieldHtml+=getCodeType(key,key,'java' ,entityJson[key]);
+            addFieldHtml+=getCodeHtml(key,key,'java' ,entityJson[key]);
         }
-
-
-
-        wCount++;
 
         addToWindow("代码"+wCount,
             ''
             + addFieldHtml
-            + getCodeType('html','ihtml','html' ,htmlStr)
+            + getCodeHtml('html','ihtml','html' ,htmlStr)
+            ,''
             );
+
+    });
+
+    //测试按钮
+    $('#btnTest').click(function (e) {
+        var checkRows = table.checkStatus(table1.tableId);
+        getConfigValue(checkRows.data);
+       // console.log(checkRows.data);
+
+        var tval =  templateSelect.getValue('valueStr');
+
+
+        if(formTools.isEmpty(tval)){
+            templateSelect.warning();
+            layer.msg("请选择模板文件");
+            return false;
+        }
+
+
+         $.post('/setData',{'data':JSON.stringify(checkRows.data),'templateStr':tval},function (res) {
+           // console.log(res);
+             res = res.data;
+             var showHtml = '';
+             var anchorStart = '<div class="an-fixed"><ul>';
+             var anchorEnd = '</ul></div>';
+             var anchorMiddle ='';
+
+             for (let i = 0; i <res.length ; i++) {
+                 var fileName = res[i]['tempFileName'];
+                 var tFileName = res[i]['tempFileName'].split(".");
+                 var fileNamePre = tFileName[0];
+                 var language = tFileName[1];
+                 var resStr = res[i]['tempRes'];
+                 anchorMiddle += getAnchorHtml( fileNamePre+'/'+language, 'i'+fileNamePre+language + wCount);
+                 showHtml += getCodeHtml(fileNamePre+'/'+language ,'i'+fileNamePre+language+wCount ,language ,resStr);
+
+             }
+
+
+             addToWindow("代码"+wCount,
+                 ''
+                 + showHtml
+                 , anchorStart+anchorMiddle+anchorEnd
+             );
+
+         },'json');
 
     });
 
@@ -140,10 +208,17 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
 
       for (var i = 0; i < data.length; i++) {
           for (var j = 0; j < cfgArr.length; j++) {
-              var name = data[i]['column']+'_'+cfgArr[j];
+              var name = data[i]['fieldName']+'_'+cfgArr[j];
               data[i][name] = $('[name='+name+']').val();
               data[i][cfgArr[j]] = $('[name='+name+']').val();
               data[i]['jtype'] =getJavaType(data[i]['ctype']);
+
+
+              if( data[i]['column'].indexOf('_')>=0){
+                  data[i]['column'] = formTools.toHump(data[i]['column'].toLowerCase());
+              }
+              data[i]['upperCamel'] = data[i]['column'][0].toUpperCase() + data[i]['column'].substring(1);
+
           }
       }
   }
@@ -159,7 +234,9 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
             return 'BigDecimal';
         }else if(dbtype.indexOf('number')>=0){
             return 'Long';
-        }else if(dbtype.indexOf('date')>=0){
+        }else if(dbtype.indexOf('int')>=0){
+            return 'Integer';
+        } else if(dbtype.indexOf('date')>=0){
             return 'Date';
         }else {
             return 'String';
@@ -171,9 +248,9 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
       if(formTools.isEmpty(data)) return data;
         var resHtml = '';
       for (var i = 0; i < data.length; i++) {
-          console.log(i, data[i]['column']);
+          console.log(i, data[i]['fieldName']);
 
-              var genType = data[i]['column']+'_'+'genType';
+              var genType = data[i]['fieldName']+'_'+'genType';
               var mdStr = model[data[i][genType]];
               var rstart = '\\${';
               var rend = '}';
@@ -182,11 +259,9 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
                    // console.log(key, data[i][key]);
                   var reg = new RegExp(rstart + key + rend,"gm");
 
-                  if(key === 'column'){
-                     mdStr = mdStr.replace(reg, formTools.toHump(data[i][key].toLowerCase()));
-                  }else {
+
                       mdStr = mdStr.replace(reg, data[i][key]);
-                  }
+
 
               }
           //console.log(mdStr);
@@ -224,11 +299,8 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
           // console.log(key, data[i][key]);
           var reg = new RegExp(rstart + key + rend,"gm");
 
-          if(key === 'column'){
-              mdStr = mdStr.replace(reg, formTools.toHump(data[key].toLowerCase()));
-          }else {
+
               mdStr = mdStr.replace(reg, data[key]);
-          }
 
       }
       return mdStr;
@@ -238,9 +310,12 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
 
 
 
-    function getCodeType(title, id, language, content) {
+    function getCodeHtml(title, id, language, content) {
       if(formTools.isEmpty(language)) language = 'plaintext';
-        var titleHtml = '<p class="p-title">' + title + '：</p>';
+
+
+
+        var titleHtml = '<p class="p-title" id="p-'+id+'">' + title + '：</p>';
         var copyHtml = '<div class="copy-button" data-clipboard-action="copy" data-clipboard-target="#'+ id +'">复制</div>';
         var prevStart = '<pre id="'+ 'p' + id +'">'+ copyHtml +'<code id="' + id +'" class="language-' + language + '">';
 
@@ -253,15 +328,22 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
     }
 
 
-    function addToWindow(title, content) {
+
+   function getAnchorHtml(title, id){
+      return '<li><a href="#p-'+id+'">'+title+'</a></li>';
+    }
+
+    function addToWindow(title, content, anchor) {
+      wCount++;
         //多窗口模式，层叠置顶
         layer.open({
             type: 1 //此处以iframe举例
             ,
             title: title
             ,
-            area: ['900px', '500px']
+            area: ['1100px', '641px']
             ,
+
             shade: 0
             ,
             maxmin: true
@@ -272,6 +354,8 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
             ,
             success: function (layero, index) {
                 layer.setTop(layero); //重点2. 保持选中窗口置顶
+
+              $(layero).find('.layui-layer-title').eq(0).after(anchor);
 
                 //记录索引，以便按 esc 键关闭。事件见代码最末尾处。
                 layer.escIndex = layer.escIndex || [];

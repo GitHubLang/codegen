@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>layout 管理系统大布局 - Layui</title>
+    <title>CodeGen-代码生成</title>
     <link rel="stylesheet" href="/assets/layui/css/layui.css">
     <link rel="stylesheet" href="/assets/highlight/styles/androidstudio.min.css">
     <style>
@@ -37,7 +37,7 @@
             margin-right: -15px;
         }
         pre{
-            margin: 14px;
+            margin: 14px 130px 14px 25px;
         }
         pre:hover .copy-button {
             display: block;
@@ -46,7 +46,7 @@
             display: none;
             position: absolute;
             width: 25px;
-            right: 13px;
+            right: 130px;
             font-size: 12px;
             color: #ffffff;
             background-color: #9999AA;
@@ -64,6 +64,59 @@
             margin: 10px 0 0px 14px;
             overflow-x: auto;
             overflow-y: hidden;
+        }
+        .an-fixed{
+            position: absolute;
+            top: 60px;
+            right: 18px;
+            width: 110px;
+            z-index: 9;
+            max-height: calc(100vh - 16px);
+            overflow-x: hidden;
+            overflow-y: auto;
+            background: #fff;
+
+        }
+        .an-fixed ul{
+            margin: 16px 0;
+            padding-left: 0;
+            font-size: 12px;
+            list-style: none;
+            border-left: 1px solid #dedede;
+            transition: all .3s cubic-bezier(.78,.14,.15,.86);
+            box-sizing: border-box;
+            display: block;
+        }
+        .an-fixed ul li{
+            margin-left: 0;
+            padding-left: 0;
+            line-height: 1.5;
+            list-style: none;
+        }
+        .an-fixed a{
+            display: block;
+            width: 110px;
+            margin-left: -1px;
+            padding-left: 16px;
+            overflow: hidden;
+            color: #000000d9;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            border-left: 2px solid transparent;
+            transition: all .3s ease;
+        }
+        .an-fixed a:hover{
+            display: block;
+            width: 110px;
+            margin-left: -8px;
+            padding-left: 16px;
+            overflow: hidden;
+            color: #1890ff;
+            font-weight: 400;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            border-left: 1px solid transparent;
+            transition: all .3s ease;
         }
     </style>
 </head>
@@ -149,7 +202,9 @@
                         </select>
                     </div>
                 </div>
-             </form>
+
+
+            </form>
 
             <div style="float: left; margin-left:15px ">
                 <button id="btnAdd" class="layui-btn icon-btn" style="background-color: #35CEB0;"><i class="layui-icon"></i>新增</button>
@@ -157,10 +212,19 @@
                 <button id="downformButton" class="layui-btn icon-btn downformButton" style="background-color: #35CEB0;"><i class="layui-icon"></i>下移</button>
                 <button id="setValue" class="layui-btn icon-btn setValue" style="background-color: #35CEB0;"><i class="layui-icon"></i>设置值</button>
             </div>
-            <div style="float: right; margin-right:15px ">
-                <button id="btnGen" class="layui-btn icon-btn" style="background-color: #35CEB0;"><i class="layui-icon"></i>生成</button>
-                <button id="btnAddField" class="layui-btn icon-btn" style="background-color: #35CEB0;"><i class="layui-icon"></i>加字段</button>
+            <div style="float: right; margin-right:15px; width: 50%;">
+<!--                <button id="btnGen" class="layui-btn icon-btn" style="background-color: #35CEB0;"><i class="layui-icon"></i>生成</button>-->
+
+                <div class="layui-inline" style="width: 50%; float:left;" >
+                    <label class="layui-form-label">模板文件 </label>
+                    <div id="tmpName">
+                    </div>
+
+                </div>
+                <button id="btnTest" class="layui-btn icon-btn" style="background-color: #35CEB0; float:left; margin-right: 30px;margin-left: 15px "><i class="layui-icon"></i>测试</button>
             </div>
+
+
             <div style="margin: 15px;">
                 <table class="layui-table" id="table1" lay-filter="table1" style="overflow-x: auto;"></table>
             </div>
@@ -177,6 +241,7 @@
 <script src="/assets/highlight/highlight.min.js"></script>
 <script src="/assets/clipbord/clipboard.min.js"></script>
 <script src="/assets/layui/layui.js"></script>
+<script src="/assets/xmselect/xm-select.js"></script>
 <script src="/assets/index.js"></script>
 <script>
     //JS
