@@ -28,7 +28,7 @@ public class JdbcTemplateOracle extends JdbcTemplate {
                 "   a.TABLE_NAME as \"tableName\",\n" +
                 "   a.column_name as \"column\",\n" +
                 "   a.column_name as \"fieldName\",\n" +
-                "    a.data_type || '(' || case when a.data_type='NUMBER' then a.DATA_PRECISION else a.data_length end || ')' as \"ctype\",\n" +
+                "    a.data_type || '(' || case when a.data_type='NUMBER' then a.DATA_PRECISION else a.data_length end || ')' as \"dbtype\",\n" +
                 "   b.comments as \"comments\",\n" +
                 "   a.nullable as \"isnull\"\n" +
                 "FROM user_tab_columns a, user_col_comments b\n" +

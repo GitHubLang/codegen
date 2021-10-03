@@ -15,8 +15,24 @@ import javax.sql.DataSource;
 @Configuration
 public class DataSourceConfig {
 
-    //主数据源配置 db1数据源配置
+
+    //本系统数据源配置
     @Primary
+    @Bean(name = "sysDataSourceProperties")
+    @ConfigurationProperties(prefix = "spring.datasource.sysdb")
+    public DataSourceProperties sysDataSourceProperties() {
+        return new DataSourceProperties();
+    }
+
+    //主数据源 本系统数据源配置
+    @Primary
+    @Bean(name = "sysDataSource")
+    public DataSource sysDataSource(@Qualifier("sysDataSourceProperties") DataSourceProperties dataSourceProperties) {
+        return dataSourceProperties.initializeDataSourceBuilder().build();
+    }
+
+    //主数据源配置 db1数据源配置
+
     @Bean(name = "oracleDataSourceProperties")
     @ConfigurationProperties(prefix = "spring.datasource.oracle")
     public DataSourceProperties oracleDataSourceProperties() {
@@ -24,7 +40,6 @@ public class DataSourceConfig {
     }
 
     //主数据源 oracle数据源
-    @Primary
     @Bean(name = "oracleDataSource")
     public DataSource oracleDataSource(@Qualifier("oracleDataSourceProperties") DataSourceProperties dataSourceProperties) {
         return dataSourceProperties.initializeDataSourceBuilder().build();

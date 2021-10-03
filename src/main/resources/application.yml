@@ -11,7 +11,12 @@ spring:
     view:
       prefix: /pages
   datasource:
-    oracle: #数据源1 Oracle
+    sysdb: # 当前系统配置所需数据库
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/halodb?serverTimezone=GMT%2B8&characterEncoding=UTF-8
+      username: root # 用户名
+      password: 123456 # 密码
+    oracle: #目标数据库类型1 Oracle
       driver-class-name: oracle.jdbc.OracleDriver
       url: jdbc:oracle:thin:@127.0.0.1:1521:orcl
       username: cwcs # 用户名
@@ -21,15 +26,16 @@ spring:
       max-active: 500
       max-pool-prepared-statement-per-connection-size: 100
       validation-query: select 'x' from dual
-    mysql: # 数据源2 mysql
+    mysql: # 目标数据库类型2 mysql
       driver-class-name: com.mysql.cj.jdbc.Driver
       url: jdbc:mysql://localhost:3306/sakila?serverTimezone=GMT%2B8&characterEncoding=UTF-8
       username: root # 用户名
       password: 123456 # 密码
 
 
+
 mydb:
-  sql: select * from sys t
+  sql: select * from users t
 
 log4j:
   logger:

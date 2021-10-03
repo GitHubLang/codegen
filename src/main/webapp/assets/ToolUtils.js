@@ -6,7 +6,7 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
     var layer = layui.layer;
     var table = layui.table;
 
-    var formTools = {
+    var ToolUtils = {
         //文件上传地址
         uploadURL: '#',
         deleteBtn: true,
@@ -40,7 +40,7 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
                         var name ='';
                          name = $(item).parent().prev().text().replace('*', '');
                          //console.log($(item).attr('name'));
-                       // if (formTools.isEmpty(name)) {
+                       // if (ToolUtils.isEmpty(name)) {
                            // name = item.attr('placeholder');
                        // }
                         return "必填项*" + name + "*不能为空!";
@@ -221,9 +221,9 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
                 this.addEditAttachment(fileListView, value[i], value, btnId, true);
             }
 
-            formTools.uploadListIns = upload.render({
+            ToolUtils.uploadListIns = upload.render({
                 elem: btnElem
-                , url: Feng.ctxPath + formTools.uploadURL //上传接口
+                , url: Feng.ctxPath + ToolUtils.uploadURL //上传接口
                 , accept: 'file'
                 , multiple: false
                 , auto: true
@@ -241,9 +241,9 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
                     var value = this.value;
                     obj.preview(function (index, file, result) {
                         //添加一个附件html
-                        formTools.addAttachment(fileListView, file, index, value, btnId, isMulti);
+                        ToolUtils.addAttachment(fileListView, file, index, value, btnId, isMulti);
                         //修改label样式padding
-                        formTools.fixLabelPadding(uploadBtn.parent().prev());
+                        ToolUtils.fixLabelPadding(uploadBtn.parent().prev());
 
                         /*          //单个重传
                                   tr.find('.demo-reload').on('click', function(){
@@ -266,7 +266,7 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
                     valueOf.orignName = files[index].name;
                     valueOf.serverName = res.data;
                     valueOf.index = index;
-                    valueOf.uploadTime = formTools.getDate() + ' ' + formTools.getTime();
+                    valueOf.uploadTime = ToolUtils.getDate() + ' ' + ToolUtils.getTime();
                     var ivalue = $(ibtnElem).val();
                     if (ivalue == '' || ivalue == '[]') {
                         /*ivalue = JSON.parse(ivalue);
@@ -286,7 +286,7 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
 
                     this.value.push(valueOf);
 
-                    $(ibtnElem).val(JSON.stringify(formTools.parseMultiFileParams(this.value)));
+                    $(ibtnElem).val(JSON.stringify(ToolUtils.parseMultiFileParams(this.value)));
 
 
                     delete files[index];
@@ -320,7 +320,7 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
          * @param isMulti 是否为多文件
          */
         addAttachment: function (obj, file, index, value, btnId, isMulti) {
-            var upTime = formTools.getDate() + ' ' + formTools.getTime();
+            var upTime = ToolUtils.getDate() + ' ' + ToolUtils.getTime();
             var deleteHtml = '<div class="layui-inline  layui-col-xs1 layui-col-md1 delete-icon-div" >\n' +
                 '                  <a class="layui-btn  layui-btn-xs file-delete-btn" id="' + index + '" ><i class="layui-icon">&#xe640;</i></a>\n' +
                 '            </div>\n';
@@ -360,13 +360,13 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
 
             //绑定删除附件删除事件
             $('#' + index).click(function (e) {
-                formTools.deleteAttachment($(this));
+                ToolUtils.deleteAttachment($(this));
                 for (var i = 0; i < value.length; i++) {
                     if (value[i].index === index) {
                         value.splice(i, 1);
                     }
                 }
-                $(document.getElementById("i" + btnId)).val(JSON.stringify(formTools.parseMultiFileParams(value)));
+                $(document.getElementById("i" + btnId)).val(JSON.stringify(ToolUtils.parseMultiFileParams(value)));
             });
         },
 
@@ -382,7 +382,7 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
         addEditAttachment: function (obj, data, value, btnId, isMulti) {
             var upTime = data.uploadTime === undefined ? '暂无数据' : data.uploadTime;
             var deleteHtml = '';
-            if (formTools.deleteBtn) {
+            if (ToolUtils.deleteBtn) {
                 deleteHtml = '<div class="layui-inline  layui-col-xs1 layui-col-md1 delete-icon-div" >\n' +
                     '                  <a class="layui-btn  layui-btn-xs file-delete-btn" id="' + data.index + '" ><i class="layui-icon">&#xe640;</i></a>\n' +
                     '            </div>\n';
@@ -422,13 +422,13 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
 
             //绑定删除附件删除事件
             $('#' + data.index).click(function (e) {
-                formTools.deleteAttachment($(this));
+                ToolUtils.deleteAttachment($(this));
                 for (var i = 0; i < value.length; i++) {
                     if (value[i].index === data.index) {
                         value.splice(i, 1);
                     }
                 }
-                $(document.getElementById("i" + btnId)).val(JSON.stringify(formTools.parseMultiFileParams(value)));
+                $(document.getElementById("i" + btnId)).val(JSON.stringify(ToolUtils.parseMultiFileParams(value)));
             });
         },
         /**
@@ -521,7 +521,7 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
             var files = $(id + ' input[type = hidden]');
             for (var i = 0; i < files.length; i++) {
                 var file = $(files[i]);
-                if (formTools.formReplaceExcept.indexOf(file.attr("name")) >= 0) {
+                if (ToolUtils.formReplaceExcept.indexOf(file.attr("name")) >= 0) {
                     return;
                 }
                 if (file.attr('title') == 'ignore') {
@@ -593,7 +593,7 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
                 var input = $(inputElement[i]);
                 var value = input.val();
                 var type = input.attr('type');
-                if (formTools.formReplaceExcept.indexOf(input.attr("name")) < 0 && type != 'hidden') {
+                if (ToolUtils.formReplaceExcept.indexOf(input.attr("name")) < 0 && type != 'hidden') {
                     input.parent().html('<label class="label-content">' + value + '</label>');
                 }
             }
@@ -607,7 +607,7 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
             for (var i = 0; i < radios.length; i++) {
                 var input = $(radios[i]);
                 var value = input.attr('title');
-                if (formTools.formReplaceExcept.indexOf(input.attr("name")) < 0) {
+                if (ToolUtils.formReplaceExcept.indexOf(input.attr("name")) < 0) {
                     input.parent().html('<label class="label-content">' + value + '</label>');
                 }
             }
@@ -618,7 +618,7 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
                 if (this.formatEmpty(input.attr('class')) != '') {
                     clazz = input.attr('class');
                 }
-                if (formTools.formReplaceExcept.indexOf(input.attr("name")) < 0) {
+                if (ToolUtils.formReplaceExcept.indexOf(input.attr("name")) < 0) {
                     input.parent().html('<label class="label-content ' + clazz + '"></label>');
                 }
             }
@@ -737,29 +737,29 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
          */
         tableAdd: function(id){
 
-            if(formTools.isEmpty(formTools.dyTable[id+'Count'])){
-                formTools.dyTable[id+'Count'] = $('#'+id+' tr').length -1;
+            if(ToolUtils.isEmpty(ToolUtils.dyTable[id+'Count'])){
+                ToolUtils.dyTable[id+'Count'] = $('#'+id+' tr').length -1;
             }
-            if(formTools.isEmpty(formTools.dyTable[id+'htmlStr'])){
-                formTools.dyTable[id+'htmlStr'] = $("#"+ id +" .tr0").html();
+            if(ToolUtils.isEmpty(ToolUtils.dyTable[id+'htmlStr'])){
+                ToolUtils.dyTable[id+'htmlStr'] = $("#"+ id +" .tr0").html();
             }
-            if(formTools.isEmpty(formTools.dyTable[id+'initCount'])){
+            if(ToolUtils.isEmpty(ToolUtils.dyTable[id+'initCount'])){
                 var reg = /isort="" value="([0-9]*?)"/g;
-                reg.test(formTools.dyTable[id+'htmlStr']);
-                if(formTools.isRealNum(RegExp.$1)){
-                    formTools.dyTable[id+'initCount'] =  parseInt(RegExp.$1);
+                reg.test(ToolUtils.dyTable[id+'htmlStr']);
+                if(ToolUtils.isRealNum(RegExp.$1)){
+                    ToolUtils.dyTable[id+'initCount'] =  parseInt(RegExp.$1);
                 }else {
-                    formTools.dyTable[id+'initCount'] = 0;
+                    ToolUtils.dyTable[id+'initCount'] = 0;
                 }
 
             }
-            formTools.dyTable[id+'Count']++;
-            var payCount = formTools.dyTable[id+'Count'];
-            var initCount = formTools.dyTable[id+'initCount'];
+            ToolUtils.dyTable[id+'Count']++;
+            var payCount = ToolUtils.dyTable[id+'Count'];
+            var initCount = ToolUtils.dyTable[id+'initCount'];
             var outerDivStr = '<tr class="tr'+ payCount +' dytable">';
             var outerDivStrEnd = '</tr>';
-            var htmlStr = formTools.dyTable[id+'htmlStr'];
-            if(formTools.isEmpty(htmlStr)) return;
+            var htmlStr = ToolUtils.dyTable[id+'htmlStr'];
+            if(ToolUtils.isEmpty(htmlStr)) return;
             var reg = new RegExp("\\[0\\]","g");
 
             htmlStr = htmlStr.replace(reg,'['+payCount+']');
@@ -770,7 +770,7 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
             form.render('select');
             var lables = $("#" + id).parents().find('.countryList:last').find('.layui-form-label');
             for (var i = 0; i <lables.length ; i++) {
-                formTools.fixLabelPadding($(lables[i]));
+                ToolUtils.fixLabelPadding($(lables[i]));
             }
         },
 
@@ -779,23 +779,23 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
          * @param id tbody id
          */
         tableDelete: function(id){
-            if(formTools.isEmpty(formTools.dyTable[id+'Count'])){
-                formTools.dyTable[id+'Count'] = $('#'+id+' tr').length -1;
+            if(ToolUtils.isEmpty(ToolUtils.dyTable[id+'Count'])){
+                ToolUtils.dyTable[id+'Count'] = $('#'+id+' tr').length -1;
                 Feng.error("请填写或修改内容！");
                 return;
             }
-            var payCount = formTools.dyTable[id+'Count'];
+            var payCount = ToolUtils.dyTable[id+'Count'];
 
             if(payCount === 0){
                 Feng.error("请填写或修改内容！");
                 return;
             }
             $("#"+ id +" .tr"+ payCount).remove();
-            formTools.dyTable[id+'Count']--;
+            ToolUtils.dyTable[id+'Count']--;
 
             var lables = $("#" + id).parents().find('.countryList:last').find('.layui-form-label');
             for (var i = 0; i <lables.length ; i++) {
-                formTools.decLabelPadding($(lables[i]),28.5);
+                ToolUtils.decLabelPadding($(lables[i]),28.5);
             }
         },
         /**
@@ -803,7 +803,7 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
          * @param id tbody id
          */
         tableGen: function(id, funs){
-            if(formTools.isEmpty(funs)){
+            if(ToolUtils.isEmpty(funs)){
                 funs = {
                     afterAdd:function (e) {},
                     afterDelete:function (e) {},
@@ -811,41 +811,41 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
                 }
             }
             $('#'+id).parent().next().find('[tbclick=add]').click(function (e) {
-                formTools.tableAdd(id);
-                if(!formTools.isEmpty(funs.afterAdd)){
-                    funs.afterAdd(formTools.dyTable[id+'Count']);
+                ToolUtils.tableAdd(id);
+                if(!ToolUtils.isEmpty(funs.afterAdd)){
+                    funs.afterAdd(ToolUtils.dyTable[id+'Count']);
                 }
             });
             $('#'+id).parent().next().find('[tbclick=delete]').click(function (e) {
-                formTools.tableDelete(id);
+                ToolUtils.tableDelete(id);
 
-                if(!formTools.isEmpty(funs.afterDelete)){
-                    funs.afterDelete(formTools.dyTable[id+'Count']);
+                if(!ToolUtils.isEmpty(funs.afterDelete)){
+                    funs.afterDelete(ToolUtils.dyTable[id+'Count']);
                 }
             });
-            if(!formTools.isEmpty(funs.after)){
-                funs.after(formTools.dyTable[id+'Count']);
+            if(!ToolUtils.isEmpty(funs.after)){
+                funs.after(ToolUtils.dyTable[id+'Count']);
             }
         },
 
         tableInit: function(id, listName, data, funs){
-            if(formTools.isEmpty(data)||formTools.isEmpty(listName)){return;}
+            if(ToolUtils.isEmpty(data)||ToolUtils.isEmpty(listName)){return;}
             for (var i = 0; i < data[listName].length; i++) {
                 var tmp = data[listName][i];
                 for(var key in tmp){
                     data[listName+'['+i+'].'+key] = tmp[key];
                 }
                 if(i !==0){
-                    formTools.tableAdd(id);
+                    ToolUtils.tableAdd(id);
                 }
             }
-            if(formTools.isEmpty(funs)){
+            if(ToolUtils.isEmpty(funs)){
                 funs = {
                     after:function (e) {}
                 }
             }
-            if(!formTools.isEmpty(funs.after)){
-                funs.after(formTools.dyTable[id+'Count']);
+            if(!ToolUtils.isEmpty(funs.after)){
+                funs.after(ToolUtils.dyTable[id+'Count']);
             }
 
         },
@@ -1060,14 +1060,14 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
             var aurl = url||'';
             var aparams = params||{};
 
-            if(formTools.isEmpty(aurl)){
+            if(ToolUtils.isEmpty(aurl)){
                 return false;
             }
             $.post(aurl, aparams,function (res) {
-                if(!formTools.isEmpty(func)){
+                if(!ToolUtils.isEmpty(func)){
                     res = func(res);
                 }
-                formTools.setSelect(name, res, conf);
+                ToolUtils.setSelect(name, res, conf);
             },'json');
 
 
@@ -1082,12 +1082,12 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
          */
         setSelect: function(name, data, conf){
 
-            if(formTools.isEmpty(name)||formTools.isEmpty(data)){
+            if(ToolUtils.isEmpty(name)||ToolUtils.isEmpty(data)){
                 return false;
             }
             var keyName = 'id';
             var valueName ='name';
-            if(!formTools.isEmpty(conf)){
+            if(!ToolUtils.isEmpty(conf)){
                 keyName = conf.keyName||'id';
                 valueName = conf.valueName||'name';
             }
@@ -1168,7 +1168,7 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
         commonEventInit: function () {
             //将某些select的option的文本加入input
             form.on('select(withName)', function (data) {
-                formTools.selectWithName(data, this);
+                ToolUtils.selectWithName(data, this);
             });
 
         },
@@ -1279,8 +1279,8 @@ layui.define(['form', 'laydate',  'upload', 'jquery', 'layer', 'table'], functio
         //console.log(table.cache.table1)
     }
 
-    formTools.commonEventInit();
-    exports('formTools', formTools);
+    ToolUtils.commonEventInit();
+    exports('ToolUtils', ToolUtils);
 
 
 });

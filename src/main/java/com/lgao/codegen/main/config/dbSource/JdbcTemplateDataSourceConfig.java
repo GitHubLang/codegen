@@ -19,6 +19,12 @@ public class JdbcTemplateDataSourceConfig {
 
     //JdbcTemplate主数据源ds1数据源
     @Primary
+    @Bean(name = "sysJdbcTemplate")
+    public JdbcTemplate sysJdbcTemplate(@Qualifier("sysDataSource") DataSource dataSource) {
+        return new JdbcTemplateOracle(dataSource);
+    }
+
+    //JdbcTemplate主数据源ds1数据源
     @Bean(name = "oracleJdbcTemplate")
     public JdbcTemplate oracleJdbcTemplate(@Qualifier("oracleDataSource") DataSource dataSource) {
         return new JdbcTemplateOracle(dataSource);

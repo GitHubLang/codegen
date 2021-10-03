@@ -37,11 +37,11 @@ public class JdbcTemplateMysql extends JdbcTemplate {
                 "    ORDINAL_POSITION AS 'columnOrder',\n" +
                 "    COLUMN_DEFAULT AS 'defaultValue',\n" +
                 "    case when IS_NULLABLE='NO' then 'N' else 'Y' end AS 'isnull',\n" +
-                "    CONCAT_WS('',DATA_TYPE,'(',CHARACTER_MAXIMUM_LENGTH,NUMERIC_PRECISION,',',NUMERIC_SCALE,')') AS 'ctype',\n" +
+                "    CONCAT_WS('',DATA_TYPE,'(',CHARACTER_MAXIMUM_LENGTH,NUMERIC_PRECISION,',',NUMERIC_SCALE,')') AS 'dbtype',\n" +
                 "    CHARACTER_MAXIMUM_LENGTH AS 'maxLength',\n" +
                 "    NUMERIC_PRECISION AS 'numMaxLength',\n" +
                 "    NUMERIC_SCALE AS 'numScale',\n" +
-                "    COLUMN_TYPE AS 'columType',\n" +
+                "    COLUMN_TYPE AS 'columnType',\n" +
                 "    COLUMN_KEY 'key',\n" +
                 "    EXTRA AS 'extra',\n" +
                 "    COLUMN_COMMENT AS 'comments'\n" +

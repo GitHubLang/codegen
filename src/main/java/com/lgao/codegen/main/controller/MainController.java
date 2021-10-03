@@ -13,6 +13,7 @@ import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
 import org.beetl.core.resource.FileResourceLoader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ResourceUtils;
@@ -31,9 +32,17 @@ import java.util.Map;
 @Controller
 public class MainController {
 
+    /**
+     * 目标数据库数据源
+     */
     @Autowired
     private JdbcTemplateMysql jdbcTemplate;
 
+    /**
+     * 本系统数据库数据源
+     */
+    @Autowired
+    private JdbcTemplate sysJdbcTemplate;
 
 
     private String template = "/pages/template/";
@@ -69,9 +78,6 @@ public class MainController {
         try {
 
             List<Map<String, Object>> maps = jdbcTemplate.getTableFieldInfo(tableName);
-            //Object o = JSON.toJSON(maps);
-            //String s = JSON.toJSONString(o, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue,
-             //       SerializerFeature.WriteDateUseDateFormat);
 
             return LayuiFactory.genLayuiEntity(maps);
         }catch (Exception e){
@@ -88,9 +94,6 @@ public class MainController {
 
         try {
             List<Map<String, Object>> maps = jdbcTemplate.getAllTables();
-            //Object o = JSON.toJSON(maps);
-            //String s = JSON.toJSONString(o, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue,
-            //       SerializerFeature.WriteDateUseDateFormat);
 
             return LayuiFactory.genLayuiEntity(maps);
         }catch (Exception e){

@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>CodeGen-代码生成</title>
-    <link rel="stylesheet" href="/assets/layui/css/layui.css">
-    <link rel="stylesheet" href="/assets/highlight/styles/androidstudio.min.css">
+    <link rel="stylesheet" href="/assets/plugin/layui/css/layui.css">
+    <link rel="stylesheet" href="/assets/plugin/highlight/styles/androidstudio.min.css">
     <style>
         .layui-table-cell {
             overflow: visible;
@@ -194,7 +194,6 @@
         <!-- 内容主体区域 -->
         <div style="padding: 15px;">
             <form class="layui-form" style="margin-bottom: 8px;"> <!-- 提示：如果你不想用form，你可以换成div等任何一个普通元素 -->
-
                 <div class="layui-inline" >
                     <label class="layui-form-label">数据库表 </label>
                     <div class="layui-input-inline" style="width: 500px">
@@ -202,7 +201,6 @@
                         </select>
                     </div>
                 </div>
-
 
             </form>
 
@@ -238,10 +236,31 @@
     </div>
 
 </div>
-<script src="/assets/highlight/highlight.min.js"></script>
-<script src="/assets/clipbord/clipboard.min.js"></script>
-<script src="/assets/layui/layui.js"></script>
-<script src="/assets/xmselect/xm-select.js"></script>
+
+<div id="setColumnValue" style="display: none">
+    <form class="layui-form" style="margin-bottom: 8px;margin-top: 8px;">
+        <div class="layui-inline" >
+            <label class="layui-form-label">选择列 </label>
+            <div class="layui-input-inline">
+                <select id = "selectedColumn" name="selectedColumn"  lay-filter="selectedColumn" lay-search="">
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-inline-block" style="margin: 8px 0px;">
+            <label class="layui-form-label">设置值 </label>
+            <div class="layui-input-inline" style="width: 212px;">
+                <input id="columnValue" name="columnValue" class="layui-input" />
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<script src="/assets/plugin/highlight/highlight.min.js"></script>
+<script src="/assets/plugin/clipbord/clipboard.min.js"></script>
+<script src="/assets/plugin/layui/layui.js"></script>
+<script src="/assets/plugin/xmselect/xm-select.js"></script>
 <script src="/assets/index.js"></script>
 <script>
     //JS

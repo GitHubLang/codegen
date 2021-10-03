@@ -5,16 +5,17 @@ layui.config({
 
 });
 
-layui.use(['element','table','form','layer', 'util','formTools'], function(){
+layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
     var element = layui.element
         ,layer = layui.layer
         ,util = layui.util
         ,table = layui.table
         ,form = layui.form
-        ,formTools = layui.formTools
-        ,model = formTools.model
+        ,ToolUtils = layui.ToolUtils
+        ,model = ToolUtils.model
         ,$ = layui.$;
     var wCount = 1;
+    var lastSelectedColumn = '';
 
     var table1 = {
         tableId: "table1"    //表格id
@@ -32,14 +33,14 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
             {field: 'fieldName',  sort: true, title: '列名'},
             {field: 'isnull',  hide: true, title: '为空'},
             {field: 'comments', align: "center", title: '备注' , templet:function (d) {
-                if(formTools.isEmpty(d.comments)) d.comments = '';
+                if(ToolUtils.isEmpty(d.comments)) d.comments = '';
                     var html = //' <div class="layui-input-block">\n' +
                         '   <input  type="text" name="'+ d.column + '_comments' + '" value="'+ d.comments +'"  autocomplete="off" class="layui-input value-input">\n' ;
                     // '   </div>';
 
                     return html;
                 }},
-            {field: 'ctype', align: "center", title: '字段类型' , sort: true},
+            {field: 'dbtype', align: "center", title: '字段类型' , sort: true},
             {field: 'genType', align: "center", title: '生成类型' , templet:function (d) {
                 var html = '<div class="layui-inline" >\n' +
                     '       <div class="layui-input-inline">\n' +
@@ -63,15 +64,24 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
                      // '   </div>';
 
                   return html;
-                }}
+                }
+            },
+            {field: 'stageCode', align: "center", title: '流程代码' , templet:function (d) {
+                    var html = //' <div class="layui-input-block">\n' +
+                        '   <input  type="text" name="'+ d.column + '_stageCode' + '" value="100"  autocomplete="off" class="layui-input cfg-input">\n' ;
+                    // '   </div>';
+
+                    return html;
+                }
+            }
         ]];
     };
-    var cfgArr = ['comments','genType','genlength'];
+    var cfgArr = ['comments','genType','genlength','stageCode'];
     var addField = ['entity','result','mapper'];
 
 
     //数据库表
-    formTools.setSelectFromUrl('dbtables', '/allTables', {},{
+    ToolUtils.setSelectFromUrl('dbtables', '/allTables', {},{
         keyName: 'name',
         valueName: 'comments'
     },function (res) {
@@ -134,6 +144,17 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
     });
 
 
+    //批量设置值按钮
+    $('#setValue').click(function (e) {
+        var checkRows = table.checkStatus(table1.tableId);
+        if(checkRows.data.length===0){
+            layer.msg('请选择数据！');
+            return false;
+        }
+        addSingleWindow("批量设置值",  $('#setColumnValue'))
+
+    });
+
 
     //生成按钮
     $('#btnGen').click(function (e) {
@@ -165,7 +186,7 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
         var tval =  templateSelect.getValue('valueStr');
 
 
-        if(formTools.isEmpty(tval)){
+        if(ToolUtils.isEmpty(tval)){
             templateSelect.warning();
             layer.msg("请选择模板文件");
             return false;
@@ -202,20 +223,25 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
 
     });
 
+    /**
+     * 获取最终数据
+     * @param data 选中行数据
+     * @returns {*}
+     */
     //获取配置信息
   function getConfigValue(data){
-      if(formTools.isEmpty(data)) {return data;}
+      if(ToolUtils.isEmpty(data)) {return data;}
 
       for (var i = 0; i < data.length; i++) {
           for (var j = 0; j < cfgArr.length; j++) {
               var name = data[i]['fieldName']+'_'+cfgArr[j];
               data[i][name] = $('[name='+name+']').val();
               data[i][cfgArr[j]] = $('[name='+name+']').val();
-              data[i]['jtype'] =getJavaType(data[i]['ctype']);
+              data[i]['jtype'] =getJavaType(data[i]['dbtype']);
 
 
               if( data[i]['column'].indexOf('_')>=0){
-                  data[i]['column'] = formTools.toHump(data[i]['column'].toLowerCase());
+                  data[i]['column'] = ToolUtils.toHump(data[i]['column'].toLowerCase());
               }
               data[i]['upperCamel'] = data[i]['column'][0].toUpperCase() + data[i]['column'].substring(1);
 
@@ -223,9 +249,31 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
       }
   }
 
+    /**
+     * 设置配置信息
+     * @param data 选中的行数据
+     * @param name 要设置的数据的列名
+     * @param value 要设置的数据的值
+     * @returns {*}
+     */
+    function setConfigValue(data, name,value){
+        if(ToolUtils.isEmpty(data)) {return data;}
+
+        for (var i = 0; i < data.length; i++) {
+
+            var fname = data[i]['fieldName']+'_'+name;
+            $('[name='+fname+']').val(value);
+            data[i][fname] =value;
+            data[i][name] = value;
+            $('[name='+name+']').val(value);
+
+
+        }
+    }
+
   function getJavaType(dbType){
 
-        if(formTools.isEmpty(dbType)) {return 'String';}
+        if(ToolUtils.isEmpty(dbType)) {return 'String';}
         var dbtype = dbType.toLowerCase();
 
         if(dbtype.indexOf('varchar')>=0){
@@ -245,7 +293,7 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
 
     //模板文件替换
   function genHtmlTemplate(data){
-      if(formTools.isEmpty(data)) return data;
+      if(ToolUtils.isEmpty(data)) return data;
         var resHtml = '';
       for (var i = 0; i < data.length; i++) {
           console.log(i, data[i]['fieldName']);
@@ -291,7 +339,7 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
 
   function getModelRes(mdStr, data) {
 
-      if(formTools.isEmpty(data)) return data;
+      if(ToolUtils.isEmpty(data)) return data;
       var rstart = '\\${';
       var rend = '}';
 
@@ -311,7 +359,7 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
 
 
     function getCodeHtml(title, id, language, content) {
-      if(formTools.isEmpty(language)) language = 'plaintext';
+      if(ToolUtils.isEmpty(language)) language = 'plaintext';
 
 
 
@@ -333,7 +381,7 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
       return '<li><a href="#p-'+id+'">'+title+'</a></li>';
     }
 
-    function addToWindow(title, content, anchor) {
+   function addToWindow(title, content, anchor) {
       wCount++;
         //多窗口模式，层叠置顶
         layer.open({
@@ -384,6 +432,62 @@ layui.use(['element','table','form','layer', 'util','formTools'], function(){
                     layer.escIndex.splice(0, 1);
                 }
             }
+        });
+    }
+
+   function addSingleWindow(title, content) {
+
+        layer.open({
+            type: 1
+            ,
+            title: title
+            ,
+            area: ['450px', '720px']
+            ,
+
+            shade: 0.3
+
+            ,btn: ['确认', '取消']
+
+            ,btnAlign: 'c'
+            ,success:function(){
+
+                var setableColumnData = [];
+                var tbHead = table1.initColumn()[0];
+                for (let i = 0; i < tbHead.length; i++) {
+                    if(cfgArr.indexOf(tbHead[i].field)>=0){
+                        setableColumnData.push({'key':tbHead[i].field,'value':tbHead[i].title});
+                    }
+                }
+                //可设置的列
+                ToolUtils.setSelect('selectedColumn', setableColumnData, {
+                    keyName: 'key',
+                    valueName: 'value'
+                });
+                $('#selectedColumn').val(lastSelectedColumn);
+                form.render();
+            }
+            ,yes: function(index, layero){
+                var selectedColumn = $('#selectedColumn').val();
+                var columnValue = $('#columnValue').val();
+                if(ToolUtils.isEmpty(selectedColumn)){
+                    layer.msg('列名不能为空！');
+                    return false;
+                }
+                setConfigValue(table.checkStatus(table1.tableId).data, selectedColumn,columnValue);
+                form.render();
+                lastSelectedColumn = selectedColumn;
+                layer.close(index);
+            }
+            ,btn2: function(index, layero){
+
+
+            //return false 开启该代码可禁止点击该按钮关闭
+            },
+
+            content: content
+
+
         });
     }
 
