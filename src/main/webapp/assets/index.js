@@ -16,6 +16,7 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
         ,$ = layui.$;
     var wCount = 1;
     var lastSelectedColumn = '';
+    var tableResult;
 
     var table1 = {
         tableId: "table1"    //表格id
@@ -23,8 +24,8 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
     /**
      * 初始化表格的列
      */
-    table1.initColumn = function () {
-        return [[
+    table1.initColumn =
+         [[
 
             {type: 'checkbox'},
             {type: 'radio',field: 'moveRadio',title:'移动'},
@@ -35,7 +36,7 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
             {field: 'comments', align: "center", title: '备注' , templet:function (d) {
                 if(ToolUtils.isEmpty(d.comments)) d.comments = '';
                     var html = //' <div class="layui-input-block">\n' +
-                        '   <input  type="text" name="'+ d.column + '_comments' + '" value="'+ d.comments +'"  autocomplete="off" class="layui-input value-input">\n' ;
+                        '   <input  type="text" name="'+ d.fieldName + '_comments' + '" value="'+ d.comments +'"  autocomplete="off" class="layui-input value-input">\n' ;
                     // '   </div>';
 
                     return html;
@@ -44,7 +45,7 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
             {field: 'genType', align: "center", title: '生成类型' , templet:function (d) {
                 var html = '<div class="layui-inline" >\n' +
                     '       <div class="layui-input-inline">\n' +
-                    '           <select id = "'+ d.column + '_genType'+'" name="'+ d.column + '_genType'+'"  lay-filter="'+ d.column + '_genType'+'" lay-search="">\n' +
+                    '           <select id = "'+ d.fieldName + '_genType'+'" name="'+ d.fieldName + '_genType'+'"  lay-filter="'+ d.fieldName + '_genType'+'" lay-search="">\n' +
                     '               <option value="input" selected>input</option>\n' +
                     '               <option value="select">select</option>\n' +
                     '               <option value="textarea">textarea</option>\n' +
@@ -60,7 +61,7 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
                 }},
             {field: 'genlength', align: "center", title: '长度' , templet:function (d) {
                   var html = //' <div class="layui-input-block">\n' +
-                      '   <input  type="text" name="'+ d.column + '_genlength' + '" value="6"  autocomplete="off" class="layui-input cfg-input">\n' ;
+                      '   <input  type="text" name="'+ d.fieldName + '_genlength' + '" value="6"  autocomplete="off" class="layui-input cfg-input">\n' ;
                      // '   </div>';
 
                   return html;
@@ -68,14 +69,14 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
             },
             {field: 'stageCode', align: "center", title: '流程代码' , templet:function (d) {
                     var html = //' <div class="layui-input-block">\n' +
-                        '   <input  type="text" name="'+ d.column + '_stageCode' + '" value="100"  autocomplete="off" class="layui-input cfg-input">\n' ;
+                        '   <input  type="text" name="'+ d.fieldName + '_stageCode' + '" value="100"  autocomplete="off" class="layui-input cfg-input">\n' ;
                     // '   </div>';
 
                     return html;
                 }
             }
         ]];
-    };
+
     var cfgArr = ['comments','genType','genlength','stageCode'];
     var addField = ['entity','result','mapper'];
 
@@ -116,23 +117,23 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
     form.on('select(dbtables)',function (data) {
         var value = data.value;
         // 渲染表格
-        var tableResult = table.render({
+         tableResult = table.render({
             elem: '#' + table1.tableId,
             url: '/tables/' + value,
             page: true,
             height: "full-200",
             cellMinWidth: 100,
-            cols: table1.initColumn()
+            cols: table1.initColumn
         });
     });
 
 
-    var tableResult = table.render({
+     tableResult = table.render({
         elem: '#' + table1.tableId,
         url: '/tables/' + " ",
         page: true,
         height: "full-200",
-        cols: table1.initColumn()
+        cols: table1.initColumn
     });
 
     //编辑列名
@@ -151,7 +152,92 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
             layer.msg('请选择数据！');
             return false;
         }
-        addSingleWindow("批量设置值",  $('#setColumnValue'))
+
+        addSingleWindow("批量设置值",  $('#setColumnValue'), ['450px', '720px'],function(){
+
+            var setableColumnData = [];
+            var tbHead = table1.initColumn[0];
+            for (let i = 0; i < tbHead.length; i++) {
+                if(cfgArr.indexOf(tbHead[i].field)>=0){
+                    setableColumnData.push({'key':tbHead[i].field,'value':tbHead[i].title});
+                }
+            }
+            //可设置的列
+            ToolUtils.setSelect('selectedColumn', setableColumnData, {
+                keyName: 'key',
+                valueName: 'value'
+            });
+            $('#selectedColumn').val(lastSelectedColumn);
+            form.render();
+        },function(index, layero){
+            var selectedColumn = $('#selectedColumn').val();
+            var columnValue = $('#columnValue').val();
+            if(ToolUtils.isEmpty(selectedColumn)){
+                layer.msg('列名不能为空！');
+                return false;
+            }
+            setConfigValue(table.checkStatus(table1.tableId).data, selectedColumn,columnValue);
+            form.render();
+            lastSelectedColumn = selectedColumn;
+            layer.close(index);
+        })
+
+    });
+
+    //新增列按钮
+    $('#btnAddColumn').click(function (e) {
+
+        addSingleWindow("新增列",  $('#addColumnDiv'),['397px','286px'],function() {
+
+        },function (index, layero) {
+            var columnTitleName = $('#columnTitleName').val();
+            var columnFieldName = $('#columnFieldName').val();
+            var columnDefaultValue = $('#columnDefaultValue').val();
+
+            var tbHead = table1.initColumn[0];
+            for (let i = 0; i < tbHead.length; i++) {
+                if(tbHead[i].field===columnFieldName){
+                    layer.msg('列编码'+columnFieldName+'已存在！');
+                    return false;
+                }
+            }
+
+            var addedColumn = {field: columnFieldName, align: "center", title: columnTitleName , templet:function (d) {
+
+                    var html = '<input  type="text" name="'+ d.fieldName + '_'+ columnFieldName + '" value="'+columnDefaultValue+'"  autocomplete="off" class="layui-input cfg-input">\n' ;
+                    return html;
+                }
+            };
+
+            tbHead.push(addedColumn);
+
+            let configValue = getConfigValue(table.getData(table1.tableId));
+
+
+            tableResult = table.render({
+                elem: '#' + table1.tableId,
+                data:configValue,
+                page: true,
+                height: "full-200",
+                cellMinWidth: 100,
+                cols: table1.initColumn
+            });
+
+
+            for (let i = 0; i <configValue.length ; i++) {
+                for (let j = 0; j < cfgArr.length; j++) {
+                    var fname = configValue[i]['fieldName']+'_'+cfgArr[j];
+                    $('[name='+fname+']').val(configValue[i][cfgArr[j]]);
+                }
+            }
+            form.render();
+
+            cfgArr.push(columnFieldName);
+
+            layer.close(index);
+
+
+        });
 
     });
 
@@ -235,7 +321,7 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
       for (var i = 0; i < data.length; i++) {
           for (var j = 0; j < cfgArr.length; j++) {
               var name = data[i]['fieldName']+'_'+cfgArr[j];
-              data[i][name] = $('[name='+name+']').val();
+             // data[i][name] = $('[name='+name+']').val();
               data[i][cfgArr[j]] = $('[name='+name+']').val();
               data[i]['jtype'] =getJavaType(data[i]['dbtype']);
 
@@ -247,6 +333,7 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
 
           }
       }
+      return  data;
   }
 
     /**
@@ -256,7 +343,7 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
      * @param value 要设置的数据的值
      * @returns {*}
      */
-    function setConfigValue(data, name,value){
+    function setConfigValue(data, name, value){
         if(ToolUtils.isEmpty(data)) {return data;}
 
         for (var i = 0; i < data.length; i++) {
@@ -435,14 +522,14 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
         });
     }
 
-   function addSingleWindow(title, content) {
+   function addSingleWindow(title,content,  area, success,yes) {
 
         layer.open({
             type: 1
             ,
             title: title
             ,
-            area: ['450px', '720px']
+            area: area
             ,
 
             shade: 0.3
@@ -450,35 +537,8 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
             ,btn: ['确认', '取消']
 
             ,btnAlign: 'c'
-            ,success:function(){
-
-                var setableColumnData = [];
-                var tbHead = table1.initColumn()[0];
-                for (let i = 0; i < tbHead.length; i++) {
-                    if(cfgArr.indexOf(tbHead[i].field)>=0){
-                        setableColumnData.push({'key':tbHead[i].field,'value':tbHead[i].title});
-                    }
-                }
-                //可设置的列
-                ToolUtils.setSelect('selectedColumn', setableColumnData, {
-                    keyName: 'key',
-                    valueName: 'value'
-                });
-                $('#selectedColumn').val(lastSelectedColumn);
-                form.render();
-            }
-            ,yes: function(index, layero){
-                var selectedColumn = $('#selectedColumn').val();
-                var columnValue = $('#columnValue').val();
-                if(ToolUtils.isEmpty(selectedColumn)){
-                    layer.msg('列名不能为空！');
-                    return false;
-                }
-                setConfigValue(table.checkStatus(table1.tableId).data, selectedColumn,columnValue);
-                form.render();
-                lastSelectedColumn = selectedColumn;
-                layer.close(index);
-            }
+            ,success: success
+            ,yes: yes
             ,btn2: function(index, layero){
 
 

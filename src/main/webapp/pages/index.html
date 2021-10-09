@@ -205,10 +205,10 @@
             </form>
 
             <div style="float: left; margin-left:15px ">
-                <button id="btnAdd" class="layui-btn icon-btn" style="background-color: #35CEB0;"><i class="layui-icon"></i>新增</button>
                 <button id="upformButton" class="layui-btn icon-btn upformButton" style="background-color: #35CEB0;"><i class="layui-icon"></i>上移</button>
                 <button id="downformButton" class="layui-btn icon-btn downformButton" style="background-color: #35CEB0;"><i class="layui-icon"></i>下移</button>
                 <button id="setValue" class="layui-btn icon-btn setValue" style="background-color: #35CEB0;"><i class="layui-icon"></i>设置值</button>
+                <button id="btnAddColumn" class="layui-btn icon-btn" style="background-color: #35CEB0;"><i class="layui-icon"></i>新增列</button>
             </div>
             <div style="float: right; margin-right:15px; width: 50%;">
 <!--                <button id="btnGen" class="layui-btn icon-btn" style="background-color: #35CEB0;"><i class="layui-icon"></i>生成</button>-->
@@ -253,6 +253,36 @@
                 <input id="columnValue" name="columnValue" class="layui-input" />
             </div>
         </div>
+
+    </form>
+</div>
+
+
+<div id="addColumnDiv" style="display: none">
+    <form class="layui-form" style="margin-bottom: 8px;margin-top: 8px;">
+
+        <div class="layui-inline-block" style="margin: 8px 0px;">
+            <label class="layui-form-label">列标题名 </label>
+            <div class="layui-input-inline" style="width: 212px;">
+                <input id="columnTitleName" name="columnTitleName" class="layui-input" />
+            </div>
+        </div>
+
+        <div class="layui-inline-block" style="margin: 8px 0px;">
+            <label class="layui-form-label">列编码 </label>
+            <div class="layui-input-inline" style="width: 212px;">
+                <input id="columnFieldName" name="columnFieldName" class="layui-input" />
+            </div>
+        </div>
+
+        <div class="layui-inline-block" style="margin: 8px 0px;">
+            <label class="layui-form-label">默认值 </label>
+            <div class="layui-input-inline" style="width: 212px;">
+                <input id="columnDefaultValue" name="columnFieldName" class="layui-input" />
+            </div>
+        </div>
+
+
 
     </form>
 </div>

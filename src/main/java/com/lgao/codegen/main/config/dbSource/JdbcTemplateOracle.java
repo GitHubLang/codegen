@@ -8,8 +8,8 @@ import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
 
-@Component
-public class JdbcTemplateOracle extends JdbcTemplate {
+@Component("JdbcTemplateOracle")
+public class JdbcTemplateOracle extends JdbcTemplate implements MyJdbc{
 
     public JdbcTemplateOracle(@Qualifier("oracleDataSource")DataSource dataSource) {
         super(dataSource);
