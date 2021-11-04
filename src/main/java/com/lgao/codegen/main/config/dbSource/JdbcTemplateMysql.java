@@ -21,6 +21,7 @@ public class JdbcTemplateMysql extends JdbcTemplate implements MyJdbc {
     }
 
 
+    @Override
     public List<Map<String, Object>> getAllTables(){
         String sql = "select table_name as \"name\", " +
                 "case when table_comment is null then table_name else  CONCAT(table_name,table_comment) end as \"comments\"" +
@@ -29,6 +30,7 @@ public class JdbcTemplateMysql extends JdbcTemplate implements MyJdbc {
     }
 
 
+    @Override
     public List<Map<String, Object>> getTableFieldInfo(String tableName){
         String sql =  "SELECT\n" +
                 "    TABLE_NAME AS 'tableName',\n" +
