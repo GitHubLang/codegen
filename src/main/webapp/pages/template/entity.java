@@ -28,11 +28,11 @@ for(data in mydata){
 @@////////////////////////写模板区域//////////////////////////
 @@//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓data为数据表格每行的数据↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 
-     public get${data.upperCamel}(){
+     public ${data.jtype} get${data.upperCamel}(){
           return ${data.column};
      }
 
-     public set${data.upperCamel}(${data.jType} ${data.column}){
+     public void set${data.upperCamel}(${data.jType+' '+data.column}){
          this.${data.column} = ${data.column};
      }
 

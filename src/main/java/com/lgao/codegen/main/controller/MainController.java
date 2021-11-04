@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.lgao.codegen.main.config.dbSource.JdbcTemplateMysql;
+import com.lgao.codegen.main.config.dbSource.JdbcTemplateOracle;
 import com.lgao.codegen.main.config.mvc.JSONParam;
 import com.lgao.codegen.main.entitys.LayuiEntity;
 import com.lgao.codegen.main.factory.LayuiFactory;
@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +37,7 @@ public class MainController {
      * 目标数据库数据源
      */
     @Autowired
-    private JdbcTemplateMysql jdbcTemplate;
+    private JdbcTemplateOracle jdbcTemplate;
 
     /**
      * 本系统数据库数据源
@@ -47,7 +48,7 @@ public class MainController {
 
     private String template = "/pages/template/";
 
-    private String root = ResourceUtils.getURL("classpath:").getPath() + template;
+    private String root = URLDecoder.decode(ResourceUtils.getURL("classpath:").getPath() + template, "UTF-8");
 
     private FileResourceLoader resourceLoader = new FileResourceLoader(root,"utf-8");
 
@@ -65,7 +66,7 @@ public class MainController {
     }
 
     @RequestMapping("/modular/{page}")
-    public String toPage(Model model, @PathVariable("page")String page){
+    public String toPage(Model model, @PathVariable("page") String page){
         model.addAttribute("s","ssss");
 
         return "/modular/" + page + ".html";
@@ -73,7 +74,7 @@ public class MainController {
 
     @RequestMapping("/tables/{tableName}")
     @ResponseBody
-    public LayuiEntity getTableData(@PathVariable("tableName")String tableName){
+    public LayuiEntity getTableData(@PathVariable("tableName") String tableName){
 
         try {
 
@@ -114,7 +115,7 @@ public class MainController {
             for (File f1:
                  files) {
                 if(f1.isFile()){
-                    Map<String,Object> map = new HashMap<>(1);
+                    Map<String, Object> map = new HashMap<>(1);
                     map.put("fileName",f1.getName());
                     maps.add(map);
                 }
@@ -132,7 +133,7 @@ public class MainController {
     @RequestMapping("/setData")
     @ResponseBody
     public LayuiEntity recJson(@RequestParam String templateStr,
-                          @JSONParam List<Map<String, Object>> data) {
+                               @JSONParam List<Map<String, Object>> data) {
 
       String[] templateFileNameArray = templateStr.split(",");
 

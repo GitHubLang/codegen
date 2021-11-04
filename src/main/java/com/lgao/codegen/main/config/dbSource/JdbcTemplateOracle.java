@@ -9,12 +9,13 @@ import java.util.List;
 import java.util.Map;
 
 @Component("JdbcTemplateOracle")
-public class JdbcTemplateOracle extends JdbcTemplate implements MyJdbc{
+public class JdbcTemplateOracle extends JdbcTemplate implements MyJdbc {
 
-    public JdbcTemplateOracle(@Qualifier("oracleDataSource")DataSource dataSource) {
+    public JdbcTemplateOracle(@Qualifier("oracleDataSource") DataSource dataSource) {
         super(dataSource);
     }
 
+    @Override
     public List<Map<String, Object>> getAllTables(){
         String sql = "select table_name as \"name\"," +
                 "case when comments is null then table_name else table_name||' - '||comments  end as \"comments\" " +
@@ -23,6 +24,7 @@ public class JdbcTemplateOracle extends JdbcTemplate implements MyJdbc{
     }
 
 
+    @Override
     public List<Map<String, Object>> getTableFieldInfo(String tableName){
         String sql =  " SELECT \n" +
                 "   a.TABLE_NAME as \"tableName\",\n" +
@@ -35,7 +37,7 @@ public class JdbcTemplateOracle extends JdbcTemplate implements MyJdbc{
                 "WHERE a.TABLE_NAME = b.table_name\n" +
                 "     and b.table_name = ? \n" +
                 "     and a.column_name = b.column_name\n" +
-                "order by a.table_name";
+                "order by a.column_id";
         return this.queryForList(sql, tableName);
     }
 

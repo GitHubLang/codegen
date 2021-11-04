@@ -120,8 +120,8 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
          tableResult = table.render({
             elem: '#' + table1.tableId,
             url: '/tables/' + value,
-            page: true,
-            height: "full-200",
+            page: {limit:1000},
+            height: "700",
             cellMinWidth: 100,
             cols: table1.initColumn
         });
@@ -131,8 +131,8 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
      tableResult = table.render({
         elem: '#' + table1.tableId,
         url: '/tables/' + " ",
-        page: true,
-        height: "full-200",
+        page: {limit:1000},
+        height: "700",
         cols: table1.initColumn
     });
 
@@ -217,8 +217,8 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
             tableResult = table.render({
                 elem: '#' + table1.tableId,
                 data:configValue,
-                page: true,
-                height: "full-200",
+                page: {limit:1000},
+                height: "700",
                 cellMinWidth: 100,
                 cols: table1.initColumn
             });

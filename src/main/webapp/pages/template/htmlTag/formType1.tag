@@ -55,7 +55,7 @@
                 <div class="layui-inline layui-col-xs${data.genlength} layui-col-md${data.genlength}" >
                     <label class="layui-form-label" ><span>*</span>${data.comments}</label>
                     <div class="layui-input-block">
-                        <input type="radio" name="${data.column}" lay-filter="${data.column}" value="1" title="通过" />
+                        <input type="radio" name="${data.column}" lay-filter="${data.column}" value="1" title="通过" checked/>
                         <input type="radio" name="${data.column}" lay-filter="${data.column}" value="3" title="退回" />
                     </div>
                 </div>

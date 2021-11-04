@@ -35,7 +35,7 @@ spring:
 
 
 mydb:
-  sql: select * from users t
+  sql: SHOW TABLES
 
 log4j:
   logger:

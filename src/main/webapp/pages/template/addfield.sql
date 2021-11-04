@@ -1,20 +1,15 @@
 <%
-    var at = '@';
-    var dr = '$';
+var dr = '$';
 
-    if(isNotEmpty(mydata)){
+if(isNotEmpty(mydata)){
     for(data in mydata){
 
 %>
 @@////////////////////////写模板区域//////////////////////////
 @@//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓data为数据表格每行的数据↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-@@if(data.jtype=='Date'){
-to_char(proj.${data.fieldName},'yyyy-MM-dd') AS "${data.column}",
-        @@}else{
-proj.${data.fieldName} AS "${data.column}",
-        @@}
+alter table ${data.tableName} add ${data.fieldName} ${data.dbtype};
 @@//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑写模板区域↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 <%
-}
+    }
 }
 %>
