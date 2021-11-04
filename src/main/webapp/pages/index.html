@@ -118,6 +118,22 @@
             border-left: 1px solid transparent;
             transition: all .3s ease;
         }
+        .bodyTop{
+            position: fixed;
+            width: 100%;
+            z-index: 100;
+            height: auto;
+            overflow: visible;
+            background: white;
+            border: 1px solid #eee;
+        }
+        .mainTable{
+            margin: 15px;
+            margin-top: 110px;
+            position: fixed;
+            overflow: auto;
+            width: calc(100% - 217px);
+        }
     </style>
 </head>
 <body>
@@ -192,7 +208,7 @@
 
     <div class="layui-body">
         <!-- 内容主体区域 -->
-        <div style="padding: 15px;">
+        <div class="bodyTop" style="padding: 15px;">
             <form class="layui-form" style="margin-bottom: 8px;"> <!-- 提示：如果你不想用form，你可以换成div等任何一个普通元素 -->
                 <div class="layui-inline" >
                     <label class="layui-form-label">数据库表 </label>
@@ -223,11 +239,14 @@
             </div>
 
 
-            <div style="margin: 15px;">
-                <table class="layui-table" id="table1" lay-filter="table1" style="overflow-x: auto;"></table>
-            </div>
+
 
         </div>
+
+        <div class="mainTable" style="">
+            <table class="layui-table" id="table1" lay-filter="table1" style="overflow-x: auto;"></table>
+        </div>
+
     </div>
 
     <div class="layui-footer">
