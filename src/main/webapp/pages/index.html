@@ -290,14 +290,27 @@
         <div class="layui-inline-block" style="margin: 8px 0px;">
             <label class="layui-form-label">列编码 </label>
             <div class="layui-input-inline" style="width: 212px;">
-                <input id="columnFieldName" name="columnFieldName" class="layui-input" />
+                <input id="columnFieldName" style="width:100%;" name="columnFieldName" class="layui-input" />
             </div>
         </div>
 
         <div class="layui-inline-block" style="margin: 8px 0px;">
             <label class="layui-form-label">默认值 </label>
             <div class="layui-input-inline" style="width: 212px;">
-                <input id="columnDefaultValue" name="columnFieldName" class="layui-input" />
+                <input id="columnDefaultValue" style="" name="columnFieldName" class="layui-input" />
+            </div>
+        </div>
+
+        <div class="layui-inline-block" style="margin: 8px 0px;">
+            <label class="layui-form-label">默认值函数 </label>
+            <div class="layui-input-inline" style=" height: 311px; width: 614px;">
+                <textarea  class="layui-input" style=" height: 100%; width:100%;" id="columnFunction" name="columnFunction" placeholder="变量d为当前行对象，请将结果存入d.tres中。
+    例如，输入内容：
+     var res='测试'；
+         res += d.fieldName；
+         d.tres = res;
+    则默认值为 测试+当前行表名。
+  "></textarea>
             </div>
         </div>
 

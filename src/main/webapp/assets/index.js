@@ -187,12 +187,13 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
     //新增列按钮
     $('#btnAddColumn').click(function (e) {
 
-        addSingleWindow("新增列",  $('#addColumnDiv'),['397px','286px'],function() {
+        addSingleWindow("新增列",  $('#addColumnDiv'),['800px','600px'],function() {
 
         },function (index, layero) {
             var columnTitleName = $('#columnTitleName').val();
             var columnFieldName = $('#columnFieldName').val();
             var columnDefaultValue = $('#columnDefaultValue').val();
+            var columnFunction = $('#columnFunction').val();
 
             var tbHead = table1.initColumn[0];
             for (let i = 0; i < tbHead.length; i++) {
@@ -203,9 +204,25 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
             }
 
             var addedColumn = {field: columnFieldName, align: "center", title: columnTitleName , templet:function (d) {
+                var defaultValue = columnDefaultValue;
+                if(ToolUtils.isEmpty(columnDefaultValue)){
+                    try{
+                        var funcs =  new Function('d',columnFunction);
+                        funcs(d);
+                        if(ToolUtils.isEmpty(d.tres)){
+                            defaultValue = columnDefaultValue;
+                        }else{
+                            defaultValue = d.tres;
+                        }
 
-                    var html = '<input  type="text" name="'+ d.fieldName + '_'+ columnFieldName + '" value="'+columnDefaultValue+'"  autocomplete="off" class="layui-input cfg-input">\n' ;
-                    return html;
+                    }catch (e) {
+                        console.error(e);
+                        defaultValue = columnDefaultValue;
+                    }
+                }
+
+                var html = `<input  type="text" name="${d.fieldName}_${columnFieldName}" value="${defaultValue}"  autocomplete="off" class="layui-input cfg-input">` ;
+                return html;
                 }
             };
 
