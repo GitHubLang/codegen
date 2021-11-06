@@ -187,13 +187,14 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
     //新增列按钮
     $('#btnAddColumn').click(function (e) {
 
-        addSingleWindow("新增列",  $('#addColumnDiv'),['800px','600px'],function() {
+        addSingleWindow("新增列",  $('#addColumnDiv'),['800px','650px'],function() {
 
         },function (index, layero) {
             var columnTitleName = $('#columnTitleName').val();
             var columnFieldName = $('#columnFieldName').val();
             var columnDefaultValue = $('#columnDefaultValue').val();
-            var columnFunction = $('#columnFunction').val();
+            var columnFunction = columnEditor.getValue ();
+
 
             var tbHead = table1.initColumn[0];
             for (let i = 0; i < tbHead.length; i++) {
@@ -550,6 +551,7 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
             ,
 
             shade: 0.3
+            ,zIndex:1000
 
             ,btn: ['确认', '取消']
 
