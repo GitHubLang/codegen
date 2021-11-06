@@ -17,6 +17,7 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
     var wCount = 1;
     var lastSelectedColumn = '';
     var tableResult;
+    var selectDataMap = new Map();
 
     var table1 = {
         tableId: "table1"    //表格id
@@ -90,7 +91,6 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
     });
 
     //模板文件
-
     var templateSelect = xmSelect.render({
         el: '#tmpName',
         filterable: true,
@@ -123,7 +123,10 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
             page: false,
             height: "700",
             cellMinWidth: 100,
-            cols: table1.initColumn
+            cols: table1.initColumn,
+             done: function(res, curr, count){
+                 rightMouseBind();
+             }
         });
     });
 
@@ -133,7 +136,10 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
         url: '/tables/' + " ",
         page: false,
         height: "700",
-        cols: table1.initColumn
+        cols: table1.initColumn,
+         done: function(res, curr, count){
+             rightMouseBind();
+         }
     });
 
     //编辑列名
@@ -238,7 +244,10 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
                 page: false,
                 height: "700",
                 cellMinWidth: 100,
-                cols: table1.initColumn
+                cols: table1.initColumn,
+                done: function(res, curr, count){
+                    rightMouseBind();
+                }
             });
 
 
@@ -460,10 +469,7 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
 
   }
 
-
-
-
-    function getCodeHtml(title, id, language, content) {
+  function getCodeHtml(title, id, language, content) {
       if(ToolUtils.isEmpty(language)) language = 'plaintext';
 
 
@@ -480,13 +486,11 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
         return  titleHtml + prevStart + content + prevEnd;
     }
 
-
-
-   function getAnchorHtml(title, id){
+  function getAnchorHtml(title, id){
       return '<li><a href="#p-'+id+'">'+title+'</a></li>';
     }
 
-   function addToWindow(title, content, anchor) {
+  function addToWindow(title, content, anchor) {
       wCount++;
         //多窗口模式，层叠置顶
         layer.open({
@@ -540,7 +544,7 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
         });
     }
 
-   function addSingleWindow(title,content,  area, success,yes) {
+  function addSingleWindow(title,content,  area, success,yes) {
 
         layer.open({
             type: 1
@@ -570,9 +574,78 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
         });
     }
 
+    var lastx=null;
+    var lasty=null;
+    function rightMouseBind(){
+
+        $('tr[data-index]').mousedown(function(e){
+            if (e.which == 3) {
+                e.preventDefault(); // 阻止默认行为
+
+                $(document).bind('mousemove',function(event){
+                    var x = event.clientX ;
+                    var y = event.clientY ;
+                    var isDown = true;
+                    if(lastx===null){
+                        lastx = x;
+                    }
+                    if(lasty===null){
+                        lasty = y;
+                    }
+                    if(y < lasty){
+                        isDown = false;
+                    }
+                    if(y > lasty){
+                        isDown = true;
+                    }
+                    //console.log($(event.target).parent().attr('data-index'));
+                    var selectIndex = $(event.target).parent().attr('data-index');
+                    if(isDown){
+                        if(!ToolUtils.isEmpty(selectIndex)){
+                            selectDataMap.set(selectIndex+'', true);
+                            $(event.target).find('.layui-unselect').attr('class','layui-unselect layui-form-checkbox layui-form-checked');
+                        }
+
+                    }else {
+                        if(!ToolUtils.isEmpty(selectIndex)){
+                            selectDataMap.set(selectIndex+'', false);
+                            $(event.target).find('.layui-unselect').attr('class','layui-unselect layui-form-checkbox');
+                        }
+
+                    }
+
+                    lastx = x;
+                    lasty = y;
+
+                    return false
+                });
+                $(document).bind('mouseup',function(e){
+
+                    var tmpdata = table.cache.table1;
+                    selectDataMap.forEach(function(value,key){
+                        if(value){
+                            tmpdata[parseInt(key)]['LAY_CHECKED'] = true;
+                        }else {
+                            tmpdata[parseInt(key)]['LAY_CHECKED'] = false;
+                        }
+                    });
+                    e.preventDefault();
+                    $(this).unbind('mousemove');
+                    $(this).unbind('mouseup');
+
+                });
+                return false
+            }
+
+        });
+    }
+    rightMouseBind();
+
+
+
 
     //头部事件
-    util.event('lay-header-event', {
+  util.event('lay-header-event', {
         //左侧菜单事件
         menuLeft: function(othis){
             layer.msg('展开左侧菜单的操作', {icon: 0});
