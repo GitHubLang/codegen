@@ -4,10 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.lgao.codegen.main.config.dbSource.JdbcTemplateOracle;
+import com.lgao.codegen.main.config.dbSource.MyJdbc;
 import com.lgao.codegen.main.config.mvc.JSONParam;
 import com.lgao.codegen.main.entitys.LayuiEntity;
 import com.lgao.codegen.main.factory.LayuiFactory;
+import com.lgao.codegen.main.utils.JdbcUtils;
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -34,16 +36,13 @@ import java.util.Map;
 public class MainController {
 
     /**
-     * 目标数据库数据源
-     */
-    @Autowired
-    private JdbcTemplateOracle jdbcTemplate;
-
-    /**
      * 本系统数据库数据源
      */
     @Autowired
     private JdbcTemplate sysJdbcTemplate;
+
+    @Autowired
+    private JdbcUtils jdbcUtils;
 
 
     private String template = "/pages/template/";
@@ -74,10 +73,13 @@ public class MainController {
 
     @RequestMapping("/tables/{tableName}")
     @ResponseBody
-    public LayuiEntity getTableData(@PathVariable("tableName") String tableName){
+    public LayuiEntity getTableData(HttpServletRequest request, @PathVariable("tableName") String tableName){
 
         try {
-
+            MyJdbc jdbcTemplate = (MyJdbc) request.getSession().getAttribute("dbsource");
+            if(jdbcTemplate==null){
+                return LayuiFactory.genLayuiEntity();
+            }
             List<Map<String, Object>> maps = jdbcTemplate.getTableFieldInfo(tableName);
 
             return LayuiFactory.genLayuiEntity(maps);
@@ -89,11 +91,72 @@ public class MainController {
 
     }
 
-    @RequestMapping("/allTables")
+    @RequestMapping("/allDbs")
     @ResponseBody
-    public LayuiEntity getAllTables(){
+    public LayuiEntity getAllDbs(){
 
         try {
+            String sql = "select id, dbname from sys_db_source";
+            List<Map<String, Object>> maps = sysJdbcTemplate.queryForList(sql);
+
+            return LayuiFactory.genLayuiEntity(maps);
+        }catch (Exception e){
+            e.printStackTrace();
+            return LayuiFactory.genLayuiEntity();
+        }
+    }
+
+
+    /**
+     * 设置数据源
+     * @param request
+     * @param id 配置表id
+     * @return
+     */
+    @RequestMapping("/setDbsource")
+    @ResponseBody
+    public LayuiEntity setDbsource(HttpServletRequest request, @RequestParam Long id){
+
+        try {
+
+            //
+            Map<Long,MyJdbc> dbsourceMap = (Map<Long, MyJdbc>) request.getSession().getAttribute("dbsourceMap");
+            if(dbsourceMap==null){
+                Map<Long,MyJdbc> map = new HashMap<>();
+                MyJdbc jdbcTemplate = jdbcUtils.getJdbcTemplateById(id);
+                map.put(id,jdbcTemplate);
+                request.getSession().setAttribute("dbsourceMap", map);
+                request.getSession().setAttribute("dbsource", jdbcTemplate);
+            }else{
+                MyJdbc myJdbc = dbsourceMap.get(id);
+                if(myJdbc==null){
+                    MyJdbc jdbcTemplate = jdbcUtils.getJdbcTemplateById(id);
+                    dbsourceMap.put(id,jdbcTemplate);
+                    request.getSession().setAttribute("dbsource", jdbcTemplate);
+                }else {
+                    request.getSession().setAttribute("dbsource", myJdbc);
+                }
+            }
+
+
+            return LayuiFactory.genLayuiEntity("sucess");
+        }catch (Exception e){
+            e.printStackTrace();
+            return LayuiFactory.genLayuiEntity("err");
+        }
+    }
+
+
+
+    @RequestMapping("/allTables")
+    @ResponseBody
+    public LayuiEntity getAllTables(HttpServletRequest request){
+
+        try {
+            MyJdbc jdbcTemplate = (MyJdbc) request.getSession().getAttribute("dbsource");
+            if(jdbcTemplate==null){
+                return LayuiFactory.genLayuiEntity();
+            }
             List<Map<String, Object>> maps = jdbcTemplate.getAllTables();
 
             return LayuiFactory.genLayuiEntity(maps);

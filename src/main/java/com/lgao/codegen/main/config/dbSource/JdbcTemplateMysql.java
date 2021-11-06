@@ -16,6 +16,8 @@ public class JdbcTemplateMysql extends JdbcTemplate implements MyJdbc {
     @Autowired
     JdbcUtils jdbcUtils;
 
+    private String url;
+
     public JdbcTemplateMysql(@Qualifier("mysqlDataSource") DataSource dataSource) {
         super(dataSource);
     }
@@ -26,7 +28,7 @@ public class JdbcTemplateMysql extends JdbcTemplate implements MyJdbc {
         String sql = "select table_name as \"name\", " +
                 "case when table_comment is null then table_name else  CONCAT(table_name,table_comment) end as \"comments\"" +
                 " from information_schema.tables where table_schema= ? order by table_name";
-        return this.queryForList(sql, jdbcUtils.getDBInfo().get("dbName"));
+        return this.queryForList(sql, jdbcUtils.getDBInfo(this.url).get("dbName"));
     }
 
 
@@ -55,7 +57,15 @@ public class JdbcTemplateMysql extends JdbcTemplate implements MyJdbc {
                 "ORDER BY\n" +
                 "    TABLE_NAME,\n" +
                 "    ORDINAL_POSITION";
-        return this.queryForList(sql,jdbcUtils.getDBInfo().get("dbName"), tableName);
+        return this.queryForList(sql,jdbcUtils.getDBInfo(this.url).get("dbName"), tableName);
     }
 
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setJdbcUtils(JdbcUtils jdbcUtils) {
+        this.jdbcUtils = jdbcUtils;
+    }
 }

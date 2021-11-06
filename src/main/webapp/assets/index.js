@@ -27,11 +27,9 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
      */
     table1.initColumn =
          [[
-
-            {type: 'checkbox'},
+            {type: 'checkbox',field: 'checkbox'},
             {type: 'radio',field: 'moveRadio',title:'移动'},
              {type: 'numbers',field: 'orderNum',title:'序号'},
-
             {field: 'fieldName',  sort: true, title: '列名'},
             {field: 'isnull',  hide: true, title: '为空'},
             {field: 'comments', align: "center", title: '备注' , templet:function (d) {
@@ -82,13 +80,15 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
     var addField = ['entity','result','mapper'];
 
 
-    //数据库表
-    ToolUtils.setSelectFromUrl('dbtables', '/allTables', {},{
-        keyName: 'name',
-        valueName: 'comments'
+    //数据源初始化
+    ToolUtils.setSelectFromUrl('dbsource', '/allDbs', {},{
+        keyName: 'id',
+        valueName: 'dbname'
     },function (res) {
         return  res.data;
     });
+
+
 
     //模板文件
     var templateSelect = xmSelect.render({
@@ -112,16 +112,42 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
     },'json');
 
 
+    // 切换数据源事件
+    form.on('select(dbsource)',function (data) {
+        var value = data.value;
+
+        if(ToolUtils.isEmpty(value)){
+            return;
+        }
+        $.post('/setDbsource', {'id':value},function (res) {
+
+            //数据库表
+            ToolUtils.setSelectFromUrl('dbtables', '/allTables', {},{
+                keyName: 'name',
+                valueName: 'comments'
+            },function (res) {
+                return  res.data;
+            });
+
+        },'json');
+
+
+
+    });
+
 
     // 数据库表事件, 渲染表格
     form.on('select(dbtables)',function (data) {
         var value = data.value;
+        if(ToolUtils.isEmpty(value)){
+            return;
+        }
         // 渲染表格
          tableResult = table.render({
             elem: '#' + table1.tableId,
             url: '/tables/' + value,
             page: false,
-            height: "700",
+            height: "auto",
             cellMinWidth: 100,
             cols: table1.initColumn,
              done: function(res, curr, count){
@@ -135,7 +161,7 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
         elem: '#' + table1.tableId,
         url: '/tables/' + " ",
         page: false,
-        height: "700",
+        height: "auto",
         cols: table1.initColumn,
          done: function(res, curr, count){
              rightMouseBind();
@@ -159,7 +185,7 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
             return false;
         }
 
-        addSingleWindow("批量设置值",  $('#setColumnValue'), ['450px', '720px'],function(){
+        addSingleWindow("批量设置值",  $('#setColumnValue'), ['800px','650px'],function(){
 
             var setableColumnData = [];
             var tbHead = table1.initColumn[0];
@@ -178,6 +204,9 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
         },function(index, layero){
             var selectedColumn = $('#selectedColumn').val();
             var columnValue = $('#columnValue').val();
+
+
+
             if(ToolUtils.isEmpty(selectedColumn)){
                 layer.msg('列名不能为空！');
                 return false;
@@ -242,7 +271,7 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
                 elem: '#' + table1.tableId,
                 data:configValue,
                 page: false,
-                height: "700",
+                height: "auto",
                 cellMinWidth: 100,
                 cols: table1.initColumn,
                 done: function(res, curr, count){
@@ -371,15 +400,35 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
      * @returns {*}
      */
     function setConfigValue(data, name, value){
-        if(ToolUtils.isEmpty(data)) {return data;}
+
+        var columnFunction = columnEditor1.getValue ();
+
+        var defaultValue = value;
+
+
 
         for (var i = 0; i < data.length; i++) {
+            if(ToolUtils.isEmpty(value)){
+                try{
+                    var funcs =  new Function('d',columnFunction);
+                    var d = data[i];
+                    funcs(d);
+                    if(ToolUtils.isEmpty(d.tres1)){
+                        continue;
+                    }else{
+                        defaultValue = d.tres1;
+                    }
 
+                }catch (e) {
+                    console.error(e);
+                    continue;
+                }
+            }
             var fname = data[i]['fieldName']+'_'+name;
-            $('[name='+fname+']').val(value);
-            data[i][fname] =value;
-            data[i][name] = value;
-            $('[name='+name+']').val(value);
+            $('[name='+fname+']').val(defaultValue);
+            data[i][fname] =defaultValue;
+            data[i][name] = defaultValue;
+            $('[name='+name+']').val(defaultValue);
 
 
         }
@@ -578,9 +627,13 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
     var lasty=null;
     function rightMouseBind(){
 
-        $('tr[data-index]').mousedown(function(e){
+        $('td[data-field=checkbox]').mousedown(function(e){
             if (e.which == 3) {
                 e.preventDefault(); // 阻止默认行为
+
+                document.oncontextmenu = function(e){
+                    return false;
+                };
 
                 $(document).bind('mousemove',function(event){
                     var x = event.clientX ;
@@ -600,16 +653,22 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
                     }
                     //console.log($(event.target).parent().attr('data-index'));
                     var selectIndex = $(event.target).parent().attr('data-index');
+                    var targetElem = $(event.target).find('.layui-unselect');
                     if(isDown){
                         if(!ToolUtils.isEmpty(selectIndex)){
                             selectDataMap.set(selectIndex+'', true);
-                            $(event.target).find('.layui-unselect').attr('class','layui-unselect layui-form-checkbox layui-form-checked');
+                            if(targetElem.eq(0).prev().attr('type')==='checkbox'){
+                                targetElem.attr('class','layui-unselect layui-form-checkbox layui-form-checked');
+                            }
+
                         }
 
                     }else {
                         if(!ToolUtils.isEmpty(selectIndex)){
                             selectDataMap.set(selectIndex+'', false);
-                            $(event.target).find('.layui-unselect').attr('class','layui-unselect layui-form-checkbox');
+                            if(targetElem.eq(0).prev().attr('type')==='checkbox') {
+                                targetElem.attr('class', 'layui-unselect layui-form-checkbox');
+                            }
                         }
 
                     }
@@ -629,9 +688,16 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
                             tmpdata[parseInt(key)]['LAY_CHECKED'] = false;
                         }
                     });
-                    e.preventDefault();
+
                     $(this).unbind('mousemove');
                     $(this).unbind('mouseup');
+
+                    setTimeout(function () {
+                        document.oncontextmenu = function(e){
+                            return true;
+                        };
+                    },100);
+
 
                 });
                 return false
