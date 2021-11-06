@@ -32,7 +32,7 @@ for(data in mydata){
           return ${data.column};
      }
 
-     public void set${data.upperCamel}(${data.jType+' '+data.column}){
+     public void set${data.upperCamel}(${data.jtype+' '+data.column}){
          this.${data.column} = ${data.column};
      }
 
