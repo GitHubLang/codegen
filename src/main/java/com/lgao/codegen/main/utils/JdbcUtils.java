@@ -3,15 +3,15 @@ package com.lgao.codegen.main.utils;
 import com.lgao.codegen.main.config.dbSource.JdbcTemplateMysql;
 import com.lgao.codegen.main.config.dbSource.JdbcTemplateOracle;
 import com.lgao.codegen.main.config.dbSource.MyJdbc;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -22,7 +22,7 @@ public class JdbcUtils {
      * 本系统数据库数据源
      */
     @Autowired
-    private JdbcTemplate sysJdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
 
     public HashMap<String, String> getDBInfo(String url) {
@@ -45,15 +45,28 @@ public class JdbcUtils {
     public MyJdbc getJdbcTemplateById(Long id){
 
         String sql = "select * from sys_db_source where id = ?";
-        Map<String, Object> map = sysJdbcTemplate.queryForMap(sql, id);
+        Map<String, Object> map = jdbcTemplate.queryForMap(sql, id);
 
         String driver = (String) map.get("driver");
         String url = (String) map.get("url");
         String username = (String) map.get("username");
         String password = (String) map.get("password");
 
-        DataSource dataSource = DataSourceBuilder.create()
-                .driverClassName(driver).url(url).username(username).password(password).build();
+        HikariConfig jdbcConfig = new HikariConfig();
+        jdbcConfig.setPoolName(getClass().getName());
+        jdbcConfig.setDriverClassName(driver);
+        jdbcConfig.setJdbcUrl(url);
+        jdbcConfig.setUsername(username);
+        jdbcConfig.setPassword(password);
+        jdbcConfig.setMaximumPoolSize(1);
+        jdbcConfig.setMaxLifetime(30);
+        jdbcConfig.setConnectionTimeout(30000);
+        jdbcConfig.setIdleTimeout(10000);
+        DataSource dataSource = new HikariDataSource(jdbcConfig);
+
+
+//        DataSource dataSource = DataSourceBuilder.create()
+//                .driverClassName(driver).url(url).username(username).password(password).build();
 
         if(driver.contains("oracle")){
             return new JdbcTemplateOracle(dataSource);

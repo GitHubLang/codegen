@@ -39,7 +39,7 @@ public class MainController {
      * 本系统数据库数据源
      */
     @Autowired
-    private JdbcTemplate sysJdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private JdbcUtils jdbcUtils;
@@ -97,7 +97,7 @@ public class MainController {
 
         try {
             String sql = "select id, dbname from sys_db_source";
-            List<Map<String, Object>> maps = sysJdbcTemplate.queryForList(sql);
+            List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql);
 
             return LayuiFactory.genLayuiEntity(maps);
         }catch (Exception e){
