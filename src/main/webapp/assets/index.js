@@ -147,7 +147,7 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
             elem: '#' + table1.tableId,
             url: '/tables/' + value,
             page: false,
-            height: "auto",
+            height: "full-208",
             cellMinWidth: 100,
             cols: table1.initColumn,
              done: function(res, curr, count){
@@ -161,7 +161,7 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
         elem: '#' + table1.tableId,
         url: '/tables/' + " ",
         page: false,
-        height: "auto",
+        height: "full-208",
         cols: table1.initColumn,
          done: function(res, curr, count){
              rightMouseBind();
@@ -271,7 +271,7 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
                 elem: '#' + table1.tableId,
                 data:configValue,
                 page: false,
-                height: "auto",
+                height: "full-208",
                 cellMinWidth: 100,
                 cols: table1.initColumn,
                 done: function(res, curr, count){
