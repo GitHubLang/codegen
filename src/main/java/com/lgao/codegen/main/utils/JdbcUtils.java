@@ -59,9 +59,11 @@ public class JdbcUtils {
         jdbcConfig.setUsername(username);
         jdbcConfig.setPassword(password);
         jdbcConfig.setMaximumPoolSize(1);
-        jdbcConfig.setMaxLifetime(30);
-        jdbcConfig.setConnectionTimeout(30000);
-        jdbcConfig.setIdleTimeout(10000);
+        jdbcConfig.setIdleTimeout(60);
+        jdbcConfig.setMinimumIdle(1);
+        //jdbcConfig.setMaxLifetime(30000);
+        //jdbcConfig.setConnectionTimeout(180000);
+        //jdbcConfig.setIdleTimeout(10000);
         DataSource dataSource = new HikariDataSource(jdbcConfig);
 
 
