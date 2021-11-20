@@ -379,15 +379,15 @@ layui.use(['element','table','form','layer', 'util','ToolUtils'], function(){
               var name = data[i]['fieldName']+'_'+cfgArr[j];
              // data[i][name] = $('[name='+name+']').val();
               data[i][cfgArr[j]] = $('[name='+name+']').val();
-              data[i]['jtype'] =getJavaType(data[i]['dbtype']);
-
-
-              if( data[i]['column'].indexOf('_')>=0){
-                  data[i]['column'] = ToolUtils.toHump(data[i]['column'].toLowerCase());
-              }
-              data[i]['upperCamel'] = data[i]['column'][0].toUpperCase() + data[i]['column'].substring(1);
-
           }
+          data[i]['jtype'] =getJavaType(data[i]['dbtype']);
+          if( data[i]['column'].indexOf('_')>=0){
+              data[i]['column'] = ToolUtils.toHump(data[i]['column'].toLowerCase());
+          } else {
+              data[i]['column'] = ToolUtils.toHump(data[i]['column'].toLowerCase());
+          }
+          data[i]['upperCamel'] = data[i]['column'][0].toUpperCase() + data[i]['column'].substring(1);
+
       }
       return  data;
   }
